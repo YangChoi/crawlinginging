@@ -13,7 +13,11 @@ describe('Crawling Unit Test', () => {
 
   describe('Request for Crawling', () => {
     it('request success', async () => {
-      const result = await service.fetchData();
+      // const result = await service.fetchData();
+    });
+    it('get response', async () => {
+      jest.spyOn(service, 'fetchData');
+      await service.getTrackInformation();
     });
   });
 });

@@ -1,28 +1,29 @@
-import * as cheerio from 'cheerio';
-import { got, gotScraping } from 'got-scraping';
-import { Injectable, Logger } from '@nestjs/common';
-import { MelonResponse } from '../melon/dto';
+import { got } from 'got-scraping';
+import { Injectable } from '@nestjs/common';
+import { VibeResponse } from './dto';
 
 /**
  * crawling melon chart
  */
-const URL = 'https://www.melon.com/commonlike/getSongLike.json';
+const URL = 'https://apis.naver.com/vibeWeb/musicapiweb/track/56398441';
 @Injectable()
 export class CrawlingService {
+  public async fetchData(): Promise<any> {
+    const response = await got.get(URL).json<VibeResponse>();
+    return response.response.result.track;
+  }
 
-  public async fetchData(): Promise<void> {
-    const query =
-      'contsIds=35454425%2C35383397%2C35383398%2C34847378%2C35454426%2C35413033%2C35333345%2C34997078%2C34754292%2C34927767%2C34061322%2C34943312%2C34657844%2C34908740%2C35361345%2C35504734%2C35238220%2C34930368%2C35008524%2C35238221%2C34787226%2C35009233%2C35485544%2C34875621%2C35008525%2C34845949%2C32508053%2C34349913%2C34431086%2C35008527%2C35353251%2C33480898%2C33496587%2C35008528%2C35008526%2C35252996%2C35008531%2C34864406%2C34772475%2C35008534%2C33658563%2C35008532%2C35383399%2C34817660%2C32872978%2C35008529%2C34100776%2C35331586%2C35008530%2C4446485%2C35371300%2C35008533%2C35388184%2C33655994%2C34626109%2C34754299%2C34701627%2C35272060%2C34752700%2C33507137%2C35177030%2C33487342%2C35215215%2C35223429%2C35434206%2C35484543%2C33978183%2C34538515%2C33666269%2C34256568%2C35380366%2C35275022%2C35145136%2C33625988%2C33061995%2C34481680%2C35506817%2C35453293%2C35389041%2C34298499%2C32698101%2C30244931%2C3414749%2C35505810%2C34599917%2C30962526%2C34101563%2C33998510%2C33359309%2C35126568%2C30287019%2C33239419%2C34943241%2C35255652%2C34883833%2C33372781%2C4276080%2C34041584%2C35505711%2C33448767';
-    const response = await got
-      .get(`${URL}`, {
-        searchParams: query,
-        resolveBodyOnly: true,
-      })
-      .json<MelonResponse>()
-      .catch((err) => {
-        Logger.error(err);
-        console.error(err);
-      });
-    console.log(response);
+  public async getTrackInformation(): Promise<void> {
+    const trackInformation = await this.fetchData();
+
+    const musicDetail = {
+      trackTitle: trackInformation.trackTitle,
+      artistName: trackInformation.artists[0].artistName,
+      albumTitle: trackInformation.album.albumTitle,
+      releaseDate: trackInformation.album.releaseDate,
+      albumGenres: trackInformation.album.albumGenres,
+      productionName: trackInformation.album.productionName,
+    };
+    console.log(musicDetail);
   }
 }
